@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect, useRef, useState } from "react"
 import { useDispatch, useSelector } from "react-redux"
 import { fetchNewsAsync } from "../../redux/slices/newsSlice"
 import { AppDispatch, RootState } from "../../redux/store"
@@ -22,24 +22,29 @@ const NewsList: React.FC = () => {
   const hasMore = useSelector((state: RootState) => state.news.hasMore)
   const [loadingMore, setLoadingMore] = useState(false)
 
-  // Загружаем первую страницу при монтировании компонента
+  // Реф для контейнера, ограниченного по высоте
+  const containerRef = useRef<HTMLDivElement>(null)
+
+  // Загружаем первую страницу при монтировании
   useEffect(() => {
     dispatch(fetchNewsAsync({ query: "technology", page: 1 }))
   }, [dispatch])
 
+  // Обработчик прокрутки для контейнера
   const scrollHandler = useCallback(() => {
+    const container = containerRef.current
+    if (!container) return
+
+    const { scrollTop, scrollHeight, clientHeight } = container
     if (
-      document.documentElement.scrollHeight -
-        (document.documentElement.scrollTop + window.innerHeight) <
-        100 &&
+      scrollHeight - scrollTop - clientHeight < 100 &&
       hasMore &&
       status !== "loading" &&
       !loadingMore
     ) {
       setLoadingMore(true)
-      // Задержка в 1 секунду перед загрузкой следующей страницы
+      // Задержка 1 секунда перед загрузкой следующей страницы
       setTimeout(() => {
-        // Передаем текущий номер страницы из Redux (который уже увеличивается в слайсе)
         dispatch(fetchNewsAsync({ query: "technology", page })).finally(() => {
           setLoadingMore(false)
         })
@@ -48,19 +53,22 @@ const NewsList: React.FC = () => {
   }, [dispatch, page, hasMore, status, loadingMore])
 
   useEffect(() => {
-    document.addEventListener("scroll", scrollHandler)
+    const container = containerRef.current
+    if (!container) return
+
+    container.addEventListener("scroll", scrollHandler)
     return () => {
-      document.removeEventListener("scroll", scrollHandler)
+      container.removeEventListener("scroll", scrollHandler)
     }
   }, [scrollHandler])
 
-  // Сортируем новости по дате (от новых к старым)
+  // Сортировка новостей по дате (от новых к старым)
   const sortedNews = [...news].sort(
     (a, b) =>
       new Date(b.publishedAt).getTime() - new Date(a.publishedAt).getTime()
   )
 
-  // Группируем новости по дате
+  // Группировка новостей по дате
   const groupedNews: { [date: string]: NewsItem[] } = sortedNews.reduce(
     (acc, item) => {
       const date = new Date(item.publishedAt).toLocaleDateString()
@@ -75,17 +83,19 @@ const NewsList: React.FC = () => {
   )
 
   return (
-    <div>
-      {status === "loading" && page === 1 && <Loader />}
-      {Object.keys(groupedNews).map((date, index) => (
-        <div key={index} style={{ position: "relative" }}>
-          <h2 className="NewsList-date">News for {date}</h2>
-          {groupedNews[date].map((item, itemIndex) => (
-            <NewsItem key={itemIndex} item={item} showDate={true} />
-          ))}
-        </div>
-      ))}
-      {loadingMore && <Loader />}
+    <div className="NewsList-container" ref={containerRef}>
+      <div className="NewsList">
+        {status === "loading" && page === 1 && <Loader />}
+        {Object.keys(groupedNews).map((date, index) => (
+          <div key={index}>
+            <h2 className="NewsList-date">News for {date}</h2>
+            {groupedNews[date].map((item, itemIndex) => (
+              <NewsItem key={itemIndex} item={item} showDate={true} />
+            ))}
+          </div>
+        ))}
+        {loadingMore && <Loader />}
+      </div>
     </div>
   )
 }
