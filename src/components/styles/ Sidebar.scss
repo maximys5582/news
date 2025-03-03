@@ -1,0 +1,37 @@
+.Sidebar {
+  display: flex;
+  align-items: center;
+  position: fixed;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background-color: #f0f0f0;
+  padding: 10px;
+  transition: left 0.3s ease-in-out;
+  z-index: 1000; /* Чтобы меню всегда было сверху */
+  font-family: "Montserrat", sans-serif;
+
+  button {
+    position: absolute;
+    right: 20px;
+    top: 20px;
+    background: none;
+  }
+}
+
+.Sidebar.open {
+  left: 0; /* При открытии меню сдвигаем его влево */
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  font-weight: 500;
+  font-size: 22px;
+  padding: 10px;
+  margin: 5px 0;
+}

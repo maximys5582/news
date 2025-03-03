@@ -1,0 +1,58 @@
+/* NewsItem.css */
+.NewsItem {
+  font-family: "Montserrat", sans-serif;
+
+  border-bottom: 1px solid #ccc;
+  padding: 16px;
+  margin: 12px 0;
+}
+
+.NewsItem-title h3 {
+  text-align: justify;
+  font-size: 1.2rem;
+  color: #333;
+}
+
+.NewsItem-item {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  margin-bottom: 8px;
+}
+
+.NewsItem-img img {
+  width: 100px;
+  height: 100px;
+  object-fit: cover;
+}
+
+.NewsItem-text p {
+  margin: 0;
+  font-size: 1rem;
+  color: #666;
+}
+
+.NewsList-date {
+  font-family: "Montserrat", sans-serif;
+  padding: 0 0 0 16px;
+  margin: 8px 0 0 0;
+  font-size: 1.3rem;
+  font-weight: bold;
+  color: #000;
+}
+
+.NewsItem-date {
+  text-align: right;
+  font-size: 1rem;
+  color: #777;
+  margin-top: 5px;
+}
+
+.NewsItem-link a {
+  color: #007bff;
+  text-decoration: none;
+}
+
+.NewsItem-link a:hover {
+  text-decoration: underline;
+}
